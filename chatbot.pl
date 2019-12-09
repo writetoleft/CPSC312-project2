@@ -33,6 +33,14 @@ chatbot(['print'], Memory) :-
     readln(Ln2),
     chatbot(Ln2, Memory).
     
+% clears Memory
+chatbot(['print'], Memory) :- 
+    write("This is what is being cleared:"), nl(), 
+    write(Memory), nl(),
+    write("What else do you like? Or do you want to ask me about places?"), nl(), flush_output(current_output),
+    readln(Ln2),
+    chatbot(Ln2, []).    
+    
 % read line, succeeds when user types in rude phrases 
 chatbot(Ln, Memory) :-
     rude_phrase(Ln, P),
