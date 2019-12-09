@@ -1,5 +1,6 @@
 :- ensure_loaded('questions.pl').
 
+% start program
 hello() :-
     write("What is your name?"), nl(), flush_output(current_output),
     readln(NameList),
@@ -8,11 +9,13 @@ hello() :-
     readln(Ln),
     chatbot(Ln, [val('Name', Name)]).
 
+% deprecated 
 clarify() :-
     write("Could you rephrase that for me please?"), nl(), flush_output(current_output),
     readln(Ln),
     chatbot(Ln, _).
 
+% alternative lines for exiting program
 chatbot(['bye'|_], Memory) :- bye(Memory).
 chatbot(['Bye'|_], Memory) :- bye(Memory).
 chatbot(['goodbye'|_], Memory) :- bye(Memory).
@@ -22,6 +25,7 @@ chatbot(['Cya'|_], Memory) :- bye(Memory).
 chatbot(['ttyl'|_], Memory) :- bye(Memory).
 chatbot(['Ttyl'|_], Memory) :- bye(Memory).
 
+% prints Memory to chat
 chatbot(['print'], Memory) :- 
     write("This is what I remember about our conversations:"), nl(), 
     write(Memory), nl(),
@@ -29,7 +33,7 @@ chatbot(['print'], Memory) :-
     readln(Ln2),
     chatbot(Ln2, Memory).
     
-
+% read line, succeeds when user types in rude phrases 
 chatbot(Ln, Memory) :-
     rude_phrase(Ln, P),
     string_concat(P, " is a strong word - not a nice thing to be saying ", Reply),
@@ -40,6 +44,7 @@ chatbot(Ln, Memory) :-
     readln(Ln2),
     chatbot(Ln2, Memory). 
 
+% read line, succeeds when user is asserting they like something but not asking question
 chatbot(Ln, Memory) :-
     % write('Like phrase case'), nl(), flush_output(current_output),
     like_phrase(Ln, Entity),
@@ -53,7 +58,8 @@ chatbot(Ln, Memory) :-
     write("What else do you like? Or do you want to ask me about places?"), nl(), flush_output(current_output),
     readln(Ln2),
     chatbot(Ln2, [Entity|Memory]).
-    
+
+% read line, successfully resolves question   
 chatbot(Ln, Memory) :-
     % write('Question case'), nl(), flush_output(current_output),
     % write(Ln), nl(), flush_output(current_output),
@@ -64,7 +70,8 @@ chatbot(Ln, Memory) :-
     write('Any other questions? Or would you like to tell me a bit about things you like?'), nl(), flush_output(current_output),
     readln(Ln2),
     chatbot(Ln2, [Ans|Memory]).     
-    
+
+% read line, not enough likes in memory to query against  
 chatbot(Ln, Memory) :-
     % write('Not enough likes case'), nl(), flush_output(current_output),
     % write(Ln), nl(), flush_output(current_output),
@@ -76,15 +83,7 @@ chatbot(Ln, Memory) :-
     readln(Ln2),
     chatbot(Ln2, Memory).      
 
-% chatbot(Ln, Memory) :-
-%    write('Like phrase fail case'), nl(), flush_output(current_output),
-%    \+ like_phrase(Ln, _),
-%    \+ like_question(Ln),
-%    \+ ask(Ln,_,_),
-%   write("I didn't understand what you like, could you clarify that for me?"), nl(), flush_output(current_output),
-%    readln(Ln2),
-%    chatbot(Ln2, Memory).
-    
+% read line, fail to resolve question or statement    
 chatbot(Ln, Memory) :-
     % write('Misunderstood case'), nl(), flush_output(current_output),
     % write(Ln), nl(), flush_output(current_output),
@@ -94,6 +93,7 @@ chatbot(Ln, Memory) :-
     readln(Ln2),
     chatbot(Ln2, Memory). 
 
+% checks input list for yes or no strings   
 check_yesno(['yes'|_], yes).
 check_yesno(['Yes'|_], yes).
 check_yesno(['ya'|_], yes).
@@ -107,12 +107,14 @@ check_yesno(['Nope'|_], nah).
 check_yesno(['nah'|_], nah).
 check_yesno(['Nah'|_], nah).
 
+% exits program
 bye(Memory) :-
     member(val('Name', Name), Memory),
     string_concat('Bye ', Name, ByeMessage),
     string_concat(ByeMessage, ', talk to you again soon!', ByeMessage2),
     write(ByeMessage2), flush_output(current_output).
 
+% attempts to match input against rude phrases
 rude_phrase(['hate'|_], 'Hate').
 rude_phrase(['stupid'|_], 'Stupid').
 rude_phrase(['annoying'|_], 'Annoying').
@@ -120,13 +122,15 @@ rude_phrase(['ugly'|_], 'Ugly').
 rude_phrase([_|T],X) :-
     rude_phrase(T,X).
 
+% attempts to match input against ways to end question indicating user preference    
 like_question(['like','?']).
 like_question(['enjoy','?']).
 like_question(['recommend','?']).
 like_question(['love','?']).
 like_question([_|T]) :-
     like_question(T).
-    
+
+% attempts to match input against statements about what user likes 
 like_phrase(['like','to',E|_], Entiting) :-
     convert_infinitive(E, Entiting),
     dif(Entiting,'?').    
@@ -148,6 +152,7 @@ like_phrase(['love',Entity|_], Entity) :-
 like_phrase([_|T],X) :-
     like_phrase(T,X).
 
+% converts verb forms to nouns    
 convert_infinitive(S, SR) :-
     sub_string(S, _, 1, 0, 'e'),
     sub_string(S,_,1,1,'e'),
