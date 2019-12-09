@@ -24,13 +24,16 @@ The following is a sample conversation to showcase some of the different functio
 - What is a new country near brazil that you would recommend?
 - clear
 - What is a new country near brazil that you would recommend?
-- What is a new country near brazil that you would recommend?
+- I like llamas
 - I love spanish
+- What is a new country near brazil that you would recommend?
+- What is a new country near brazil that you would recommend?
 - What is a new country near paraguay that you would recommend?
 - I like to ski
 - I like to cry
 - What is the capital of a country you would recommend?
 - What is the capital of a new country you would recommend?
+- What new country has trains?
 - What new country has trains?
 - I hate these suggestions
 - bye
