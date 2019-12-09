@@ -90,7 +90,7 @@ chatbot(Ln, Memory) :-
     % write(Ln), nl(), flush_output(current_output),
     \+ ask(Ln,_,_),
     % write(Ln), nl(), flush_output(current_output),
-    write('Im not sure I understood I have an answer for that. Could you ask something else?'), nl(), flush_output(current_output),
+    write('Im not sure I have an answer for that. Could you ask something else?'), nl(), flush_output(current_output),
     readln(Ln2),
     chatbot(Ln2, Memory). 
 

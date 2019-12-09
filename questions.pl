@@ -18,11 +18,12 @@
 
 % A noun phrase is a determiner followed by adjectives followed
 % by a noun followed by an optional modifying phrase:
-noun_phrase(L0,L4,Entity,C0,C4,Memory) :-
+noun_phrase(L0,L5,Entity,C0,C5,Memory) :-
     det(L0,L1,Entity,C0,C1,Memory),
     adjectives(L1,L2,Entity,C1,C2,Memory),
     noun(L2,L3,Entity,C2,C3,Memory),
-    mp(L3,L4,Entity,C3,C4,Memory).
+    mp(L3,L4,Entity,C3,C4,Memory),
+    pp(L4,L5,Entity,C4,C5,Memory).
 noun_phrase(L0,L4,Entity,C0,C4,Memory) :-
     proper_noun(L0,L4,Entity,C0,C4,Memory).    
 
@@ -54,19 +55,20 @@ mp(L0,L2,Subject,C0,C2,Memory) :-
     noun_phrase(L1,L2,Object,C1,C2,Memory).
 mp([that|L0],L2,Subject,C0,C2,Memory) :-
     reln(L0,L1,Subject,Object,C0,C1,Memory),
-    noun_phrase(L1,L2,Object,C1,C2,Memory).
-mp([that|L0],L2,Subject,C0,C2,Memory) :-
-    reln(L0,L2,Subject,_,C0,C2,Memory).
-mp([that|L0],L2,Subject,C0,C2,Memory) :-
-    reln(L0,L1,Subject,_,C0,C1,Memory),
-    mp(L1,L2,Subject,C1,C2,Memory).   
+    noun_phrase(L1,L2,Object,C1,C2,Memory).  
 mp(L,L,_,C,C,_).
+
+pp(L0,L1,Subject,C0,C1,Memory) :-
+    pref(L0,L1,Subject,C0,C1,Memory).
+pp([that|L0],L1,Subject,C0,C1,Memory) :-
+    pref(L0,L1,Subject,C0,C1,Memory).  
+pp(L,L,_,C,C,_).
 
 % DICTIONARY
 % adj(L0,L1,Entity,C0,C1) is true if L0-L1 
 % is an adjective that imposes constraints C0-C1 Entity
 adj([large | L],L,Entity, [large(Entity)|C],C,_).
-adj([new | L],L,Entity, [new(Entity,Memory)|C],C,Memory).
+adj(['new' | L],L,Entity, [notinmem(Entity,Memory)|C],C,Memory).
 adj([recommended | L],L,Entity, [minmemlikes(Entity,Memory)|C],C,Memory).
 adj([Lang,speaking | L],L,Entity, [speaks(Entity,Lang)|C],C,_).
 adj([Lang,-,speaking | L],L,Entity, [speaks(Entity,Lang)|C],C,_).
@@ -91,17 +93,17 @@ reln([is,near | L],L,O1,O2, [same_continent(O1,O2)|C],C,_).
 reln([near | L],L,O1,O2, [same_continent(O1,O2)|C],C,_).
 reln([has | L],L,O1,O2, [has(O1,O2)|C],C,_).
 
-reln(['I',might,like| L],L,O1,_, [minmemlikes(O1,Memory)|C],C,Memory).
-reln(['I',might,enjoy| L],L,O1,_, [minmemlikes(O1,Memory)|C],C,Memory).
-reln(['I',might,love| L],L,O1,_, [minmemlikes(O1,Memory)|C],C,Memory).
-reln(['I',would,like| L],L,O1,_, [minmemlikes(O1,Memory)|C],C,Memory).
-reln(['I',would,enjoy| L],L,O1,_, [minmemlikes(O1,Memory)|C],C,Memory).
-reln(['I',would,love| L],L,O1,_, [minmemlikes(O1,Memory)|C],C,Memory).
-reln(['you',would,recommend| L],L,O1,_, [minmemlikes(O1,Memory)|C],C,Memory).
-reln(['you',might,recommend| L],L,O1,_, [minmemlikes(O1,Memory)|C],C,Memory).
-reln(['I',will,like| L],L,O1,_, [minmemlikes(O1,Memory)|C],C,Memory).
-reln(['I',will,enjoy| L],L,O1,_, [minmemlikes(O1,Memory)|C],C,Memory).
-reln(['I',will,love| L],L,O1,_, [minmemlikes(O1,Memory)|C],C,Memory).
+pref(['I',might,like| L],L,O1, [minmemlikes(O1,Memory)|C],C,Memory).
+pref(['I',might,enjoy| L],L,O1, [minmemlikes(O1,Memory)|C],C,Memory).
+pref(['I',might,love| L],L,O1, [minmemlikes(O1,Memory)|C],C,Memory).
+pref(['I',would,like| L],L,O1, [minmemlikes(O1,Memory)|C],C,Memory).
+pref(['I',would,enjoy| L],L,O1, [minmemlikes(O1,Memory)|C],C,Memory).
+pref(['I',would,love| L],L,O1, [minmemlikes(O1,Memory)|C],C,Memory).
+pref(['you',would,recommend| L],L,O1, [minmemlikes(O1,Memory)|C],C,Memory).
+pref(['you',might,recommend| L],L,O1, [minmemlikes(O1,Memory)|C],C,Memory).
+pref(['I',will,like| L],L,O1, [minmemlikes(O1,Memory)|C],C,Memory).
+pref(['I',will,enjoy| L],L,O1, [minmemlikes(O1,Memory)|C],C,Memory).
+pref(['I',will,love| L],L,O1, [minmemlikes(O1,Memory)|C],C,Memory).
 
 % question(Question,QR,Entity,Memory) is true if Query provides an answer about Entity to Question
 question(['Is' | L0],L2,Entity,C0,C2,Memory) :-
@@ -155,11 +157,11 @@ addlike(Entity,X):-
     attraction(X),
     has(Entity,X).
 
-new(Entity,Memory):-
+notinmem(Entity,Memory):-
     country(Entity),
     \+ member(Entity,Memory).
     
-new(Entity,Memory):-
+notinmem(Entity,Memory):-
     continent(Entity),
     \+ member(Entity,Memory).
     
