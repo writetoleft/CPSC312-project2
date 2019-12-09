@@ -34,7 +34,7 @@ chatbot(['print'], Memory) :-
     chatbot(Ln2, Memory).
     
 % clears Memory
-chatbot(['print'], Memory) :- 
+chatbot(['clear'], Memory) :- 
     write("This is what is being cleared:"), nl(), 
     write(Memory), nl(),
     write("What else do you like? Or do you want to ask me about places?"), nl(), flush_output(current_output),
