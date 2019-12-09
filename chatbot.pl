@@ -37,9 +37,12 @@ chatbot(['print'], Memory) :-
 chatbot(['clear'], Memory) :- 
     write("This is what is being cleared:"), nl(), 
     write(Memory), nl(),
-    write("What else do you like? Or do you want to ask me about places?"), nl(), flush_output(current_output),
-    readln(Ln2),
-    chatbot(Ln2, []).    
+    write("What is your name?"), nl(), flush_output(current_output),
+    readln(NameList),
+    atomic_list_concat(NameList, ' ', Name),
+    write("Ask me anything about places to go to, or tell me things you like, so we can plan a great trip: "), flush_output(current_output),
+    readln(Ln),
+    chatbot(Ln, [val('Name', Name)]). 
     
 % read line, succeeds when user types in rude phrases 
 chatbot(Ln, Memory) :-
