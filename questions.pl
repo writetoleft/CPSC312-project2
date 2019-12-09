@@ -17,7 +17,7 @@
 % C0 is a list such that C4 is an ending of C0 and C0-C4 contains the constraints imposed by the noun phrase
 
 % A noun phrase is a determiner followed by adjectives followed
-% by a noun followed by an optional modifying phrase:
+% by a noun followed by an optional modifying phrase and//or a preference phrase:
 noun_phrase(L0,L5,Entity,C0,C5,Memory) :-
     det(L0,L1,Entity,C0,C1,Memory),
     adjectives(L1,L2,Entity,C1,C2,Memory),
@@ -58,6 +58,10 @@ mp([that|L0],L2,Subject,C0,C2,Memory) :-
     noun_phrase(L1,L2,Object,C1,C2,Memory).  
 mp(L,L,_,C,C,_).
 
+% An optional preference phrase / relative clause is either
+% a preference relation or
+% 'that' followed by a preference relation relation or
+% nothing 
 pp(L0,L1,Subject,C0,C1,Memory) :-
     pref(L0,L1,Subject,C0,C1,Memory).
 pp([that|L0],L1,Subject,C0,C1,Memory) :-
@@ -85,6 +89,7 @@ proper_noun([X | L],L,X,C,C,_) :- continent(X).
 proper_noun([X | L],L,X,C,C,_) :- language(X).
 proper_noun([X | L],L,X,C,C,_) :- attraction(X).
 
+% a relation between a subject and an object
 reln([borders | L],L,O1,O2,[borders(O1,O2)|C],C,_).
 reln([the,capital,of | L],L,O1,O2, [capital(O2,O1)|C],C,_).
 reln([next,to | L],L,O1,O2, [borders(O1,O2)|C],C,_).
@@ -93,6 +98,7 @@ reln([is,near | L],L,O1,O2, [same_continent(O1,O2)|C],C,_).
 reln([near | L],L,O1,O2, [same_continent(O1,O2)|C],C,_).
 reln([has | L],L,O1,O2, [has(O1,O2)|C],C,_).
 
+% an indicator to check an object against constraints in memory
 pref(['I',might,like| L],L,O1, [minmemlikes(O1,Memory)|C],C,Memory).
 pref(['I',might,enjoy| L],L,O1, [minmemlikes(O1,Memory)|C],C,Memory).
 pref(['I',might,love| L],L,O1, [minmemlikes(O1,Memory)|C],C,Memory).
@@ -117,8 +123,6 @@ question(['What' | L0],L2,Entity,C0,C2,Memory) :-
     noun_phrase(L0,L1,Entity,C0,C1,Memory),
     mp(L1,L2,Entity,C1,C2,Memory).
 
-% TEST ask(['What',is,a,country,near,brazil,that,I,might,like,'?'],A,[birdwatching,winter]).    
-
 % ask(Q,A,Memory) gives answer A to question Q, possibly constrained by facts about the user stored in memory
 ask(Q,A,Memory) :-
     get_constraints_from_question(Q,A,C,Memory),
@@ -140,10 +144,12 @@ minmemlikes(Entity,Memory):-
     collectlikes(Entity,Memory,Likes),
     length(Likes,Count),
     Count >= 1.
-    
+
+% collectlikes is true if result is given be checking memory for preferences related to entity    
 collectlikes(Entity,Memory,Result):-
     include(addlike(Entity),Memory,Result).    
 
+% addlike is true if entity belongs to continent, speaks a language, or has an attraction 
 addlike(Entity,X):-
     country(Entity),
     continent(X),
@@ -157,10 +163,10 @@ addlike(Entity,X):-
     attraction(X),
     has(Entity,X).
 
+% checks if country or continent is not already in memory
 notinmem(Entity,Memory):-
     country(Entity),
     \+ member(Entity,Memory).
-    
 notinmem(Entity,Memory):-
     continent(Entity),
     \+ member(Entity,Memory).
